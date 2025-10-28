@@ -1,56 +1,516 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2202.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTC Wallet Living Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.6) 0%, rgba(228,240,255,0.2) 35%, rgba(194,209,255,0.15) 60%, rgba(149,171,255,0.1) 100%),
+                      linear-gradient(135deg, #f9fbff 0%, #dfe9ff 40%, #f9fbff 100%);
+      --glass-color: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.35);
+      --accent-primary: #5d6bff;
+      --accent-secondary: #9f5dff;
+      --text-primary: #1c1f33;
+      --text-secondary: rgba(28, 31, 51, 0.65);
+      --shadow: 0 25px 50px -20px rgba(93, 107, 255, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px 24px 64px;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    header {
+      width: min(1100px, 100%);
+      background: var(--glass-color);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(28px) saturate(140%);
+      border-radius: 32px;
+      padding: 32px clamp(24px, 4vw, 48px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 85% 15%, rgba(159, 93, 255, 0.35), transparent 45%);
+      z-index: -1;
+    }
+
+    .headline {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .headline h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      margin: 0;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .headline h1 span {
+      font-size: 36px;
+    }
+
+    .wallet-address {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 16px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(93, 107, 255, 0.12);
+      color: var(--accent-primary);
+      width: fit-content;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      backdrop-filter: blur(20px) saturate(160%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      min-height: 120px;
+    }
+
+    .metric-card .label {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+    }
+
+    .metric-card .value {
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-card .sub {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .grid-section {
+      width: min(1100px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .grid-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .grid-header h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 32px);
+      letter-spacing: -0.02em;
+    }
+
+    .timestamp {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .item-card {
+      position: relative;
+      padding: 24px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(30px) saturate(160%);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: transform 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .item-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(93, 107, 255, 0.2), rgba(159, 93, 255, 0.1));
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      z-index: 0;
+    }
+
+    .item-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 35px 60px -30px rgba(93, 107, 255, 0.55);
+    }
+
+    .item-card:hover::before {
+      opacity: 1;
+    }
+
+    .item-card-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .item-emoji {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      background: linear-gradient(140deg, rgba(93, 107, 255, 0.25), rgba(159, 93, 255, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 20px -12px rgba(93, 107, 255, 0.6);
+    }
+
+    .item-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .item-title .name {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .item-title .price {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .progress {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(28, 31, 51, 0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar span {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.7s ease;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .quantity {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--accent-primary);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 24px 16px 48px;
+      }
+
+      header {
+        border-radius: 24px;
+        padding: 24px;
+      }
+
+      .item-card {
+        padding: 20px;
+      }
+
+      .item-emoji {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+      }
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Просування веб-сайтів&lt;/title&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Просування веб-сайтів&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;main&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Чому просування веб-сайтів важливо?&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Просування веб-сайтів є ключовим елементом успіху в онлайн-середовищі. Це допомагає залучати нових відвідувачів, підвищує видимість сайту у пошукових системах та сприяє досягненню бізнес-цілей. Правильно просунутий веб-сайт забезпечує більше можливостей для залучення цільової аудиторії, збільшення продажів та підвищення рівня впізнаваності бренду.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Оптимізація для пошукових систем (SEO)&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Оптимізація для пошукових систем (SEO) є однією з найважливіших складових просування веб-сайтів. Це включає в себе використання ключових слів у контенті, оптимізацію мета-тегів, структурування контенту, покращення швидкості завантаження сторінок та інші методи, які сприяють покращенню рейтингу веб-сайту у пошукових системах, зокрема у результатах пошуку Google.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Маркетингові кампанії&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Маркетингові кампанії грають важливу роль у просуванні веб-сайтів. Це охоплює різні види реклами та просування, які допомагають привернути увагу цільової аудиторії. Наприклад, контекстна реклама, соціальні медіа, електронна пошта, відео-реклама та інші маркетингові інструменти дозволяють підвищити свідомість про веб-сайт та залучити нових відвідувачів.&lt;/p&gt;</p>
-<p class="p1">&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Аналітика та відстеження результатів&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Аналітика та відстеження результатів є необхідними компонентами просування веб-сайтів. Завдяки аналітичним інструментам, таким як Google Analytics, можна отримати важливі дані про трафік на веб-сайті, джерела трафіку, поведінку відвідувачів та іншу інформацію. Це дозволяє оцінити ефективність просування та вносити відповідні зміни для покращення результатів.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p1">&lt;/main&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Аналітика та відстеження результатів&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Аналітика та відстеження результатів є необхідними компонентами просування веб-сайтів. Завдяки аналітичним інструментам, таким як Google Analytics, можна отримати важливі дані про трафік на веб-сайті, джерела трафіку, поведінку відвідувачів та іншу інформацію. Це дозволяє оцінити ефективність просування та вносити відповідні зміни для покращення результатів.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p1">&lt;/main&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+  <header>
+    <div class="headline">
+      <h1><span>🪙</span> BTC Living Dashboard</h1>
+      <div class="wallet-address" id="walletAddress"></div>
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="label">Баланс BTC</div>
+          <div class="value" id="btcBalance">—</div>
+          <div class="sub">По данным сети Bitcoin</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Эквивалент USD</div>
+          <div class="value" id="usdBalance">—</div>
+          <div class="sub" id="priceSource">Курс BTC/USD обновляется</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Курс BTC</div>
+          <div class="value" id="btcPrice">—</div>
+          <div class="sub">USD за 1 BTC</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="grid-section">
+    <div class="grid-header">
+      <h2>Что можно позволить на баланс кошелька</h2>
+      <div class="timestamp" id="lastUpdated">Обновляем данные…</div>
+    </div>
+    <div class="items-grid" id="itemsGrid"></div>
+  </section>
+
+  <script>
+    const walletAddress = 'bc1qa30zuf8xu0rj9yqmxyu64m0j3x7axf8p3l0k87';
+    const items = [
+      { key: 'house', name: 'Дом (150 м², пригород)', priceUSD: 3000000, emoji: '🏠' },
+      { key: 'apartment', name: 'Квартира (70 м², центр города)', priceUSD: 500000, emoji: '🏙️' },
+      { key: 'pension', name: 'Пенсия', priceUSD: 500000, emoji: '🧓' },
+      { key: 'tuition', name: 'Обучение в вузе (год)', priceUSD: 30000, emoji: '🎓' },
+      { key: 'child18', name: 'Содержание ребёнка до 18 лет', priceUSD: 50000, emoji: '🧒' },
+      { key: 'new_car', name: 'Автомобиль (новый, С-класс)', priceUSD: 120000, emoji: '🚗' },
+      { key: 'used_car', name: 'Автомобиль (б/у, 5–7 лет)', priceUSD: 50000, emoji: '🚙' },
+      { key: 'flight', name: 'Авиабилет туда-обратно (Европа↔США)', priceUSD: 1500, emoji: '✈️' },
+      { key: 'dinner', name: 'Ужин в ресторане (на двоих)', priceUSD: 150, emoji: '🍽️' },
+      { key: 'gym', name: 'Абонемент в спортзал (год)', priceUSD: 1200, emoji: '🏋️' },
+      { key: 'rent', name: 'Аренда квартиры (месяц)', priceUSD: 2500, emoji: '🛏️' },
+      { key: 'utilities', name: 'Коммунальные услуги (месяц)', priceUSD: 500, emoji: '💡' },
+      { key: 'internet', name: 'Интернет (месяц)', priceUSD: 200, emoji: '🌐' },
+      { key: 'taxi', name: 'Поездка на такси по городу', priceUSD: 80, emoji: '🚕' },
+      { key: 'coffee', name: 'Кофе латте', priceUSD: 1000, emoji: '☕' },
+      { key: 'smartphone', name: 'Смартфон (флагман)', priceUSD: 2000, emoji: '📱' },
+      { key: 'laptop', name: 'Ноутбук (производительный)', priceUSD: 3000, emoji: '💻' },
+      { key: 'motorcycle', name: 'Мотоцикл', priceUSD: 15000, emoji: '🏍️' },
+      { key: 'milk', name: 'Пакет молока (1 л)', priceUSD: 2, emoji: '🥛' },
+      { key: 'bread', name: 'Хлеб (батон)', priceUSD: 4, emoji: '🍞' }
+    ];
+
+    const walletAddressNode = document.getElementById('walletAddress');
+    const btcBalanceNode = document.getElementById('btcBalance');
+    const usdBalanceNode = document.getElementById('usdBalance');
+    const btcPriceNode = document.getElementById('btcPrice');
+    const lastUpdatedNode = document.getElementById('lastUpdated');
+    const priceSourceNode = document.getElementById('priceSource');
+    const itemsGridNode = document.getElementById('itemsGrid');
+
+    walletAddressNode.innerHTML = `<span>Адрес:</span> ${walletAddress}`;
+
+    const formatNumber = (value, options = {}) => new Intl.NumberFormat('ru-RU', options).format(value);
+
+    const renderItems = (balanceUSD) => {
+      const sorted = [...items].sort((a, b) => b.priceUSD - a.priceUSD);
+      itemsGridNode.innerHTML = '';
+
+      sorted.forEach(item => {
+        const quantity = item.priceUSD > 0 ? Math.floor(balanceUSD / item.priceUSD) : 0;
+        const percent = item.priceUSD > 0 ? Math.min((balanceUSD / item.priceUSD) * 100, 9999) : 0;
+        const percentDisplay = percent >= 100 ? '100%+' : `${percent.toFixed(percent < 1 ? 1 : 0)}%`;
+
+        const card = document.createElement('article');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-card-content">
+            <div class="item-header">
+              <div class="item-emoji">${item.emoji}</div>
+              <div class="item-title">
+                <div class="name">${item.name}</div>
+                <div class="price">${formatNumber(item.priceUSD, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</div>
+              </div>
+            </div>
+            <div class="progress">
+              <div class="progress-info">
+                <span>Баланс покрывает</span>
+                <span>${percentDisplay}</span>
+              </div>
+              <div class="progress-bar">
+                <span style="transform: scaleX(${Math.min(percent, 100) / 100})"></span>
+              </div>
+            </div>
+            <div class="quantity">${quantity.toLocaleString('ru-RU')}×</div>
+          </div>
+        `;
+        itemsGridNode.appendChild(card);
+      });
+    };
+
+    const fetchWalletBalance = async () => {
+      const response = await fetch(`https://blockstream.info/api/address/${walletAddress}`, {
+        cache: 'no-store'
+      });
+      if (!response.ok) {
+        throw new Error('Не удалось получить данные по кошельку');
+      }
+      const data = await response.json();
+      const funded = (data.chain_stats?.funded_txo_sum || 0) + (data.mempool_stats?.funded_txo_sum || 0);
+      const spent = (data.chain_stats?.spent_txo_sum || 0) + (data.mempool_stats?.spent_txo_sum || 0);
+      const satoshiBalance = funded - spent;
+      return satoshiBalance / 1e8;
+    };
+
+    const fetchWithTimeout = async (url, options = {}, timeout = 10000) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    const priceProviders = [
+      {
+        name: 'CoinGecko',
+        url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+        parse: async (response) => {
+          const data = await response.json();
+          return data.bitcoin?.usd;
+        }
+      },
+      {
+        name: 'Coinbase',
+        url: 'https://api.coinbase.com/v2/prices/BTC-USD/spot',
+        parse: async (response) => {
+          const data = await response.json();
+          const amount = data.data?.amount;
+          return amount ? Number(amount) : undefined;
+        }
+      }
+    ];
+
+    const fetchBtcPrice = async () => {
+      for (const provider of priceProviders) {
+        try {
+          const response = await fetchWithTimeout(provider.url, {
+            headers: {
+              'Accept': 'application/json'
+            },
+            cache: 'no-store'
+          }, 8000);
+
+          if (!response.ok) {
+            console.warn(`Не удалось получить данные от ${provider.name}: ${response.status}`);
+            continue;
+          }
+
+          const price = await provider.parse(response);
+          if (typeof price === 'number' && !Number.isNaN(price)) {
+            return { price, source: provider.name };
+          }
+        } catch (error) {
+          console.warn(`Ошибка при запросе ${provider.name}:`, error);
+        }
+      }
+
+      throw new Error('Не удалось получить курс BTC');
+    };
+
+    const setLoadingState = () => {
+      btcBalanceNode.textContent = '…';
+      usdBalanceNode.textContent = '…';
+      btcPriceNode.textContent = '…';
+      lastUpdatedNode.textContent = 'Обновляем данные…';
+      priceSourceNode.textContent = 'Источник курса: обновляем…';
+    };
+
+    const updateDashboard = async () => {
+      try {
+        setLoadingState();
+        const [balanceBTC, btcPriceResult] = await Promise.all([
+          fetchWalletBalance(),
+          fetchBtcPrice()
+        ]);
+
+        const { price: btcPrice, source: priceSource } = btcPriceResult;
+        const balanceUSD = balanceBTC * btcPrice;
+
+        btcBalanceNode.textContent = `${formatNumber(balanceBTC, { minimumFractionDigits: 6, maximumFractionDigits: 6 })} BTC`;
+        usdBalanceNode.textContent = formatNumber(balanceUSD, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+        btcPriceNode.textContent = formatNumber(btcPrice, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+        priceSourceNode.textContent = `Источник курса: ${priceSource}`;
+        lastUpdatedNode.textContent = `Обновлено: ${new Date().toLocaleTimeString('ru-RU')}`;
+
+        renderItems(balanceUSD);
+      } catch (error) {
+        console.error(error);
+        lastUpdatedNode.textContent = 'Не удалось обновить данные. Попробуйте позже.';
+        priceSourceNode.textContent = 'Ошибка получения курса';
+      }
+    };
+
+    updateDashboard();
+    setInterval(updateDashboard, 60000);
+  </script>
 </body>
 </html>
